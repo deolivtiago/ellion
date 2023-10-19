@@ -1,4 +1,4 @@
-defmodule EllionCoreWeb.Endpoint do
+defmodule EllionWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :ellion
 
   # The session will be stored in the cookie and signed,
@@ -21,7 +21,7 @@ defmodule EllionCoreWeb.Endpoint do
     at: "/",
     from: :ellion,
     gzip: false,
-    only: EllionCoreWeb.static_paths()
+    only: EllionWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -41,5 +41,5 @@ defmodule EllionCoreWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug EllionCoreWeb.Router
+  plug EllionWeb.Router
 end
