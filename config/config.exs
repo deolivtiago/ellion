@@ -26,6 +26,14 @@ config :ellion, EllionWeb.Endpoint,
 # Configures the database timezone
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
+# Configures Joken JWT secret key
+config :joken,
+  default_signer:
+    System.get_env(
+      "JWT_SECRET_KEY",
+      "brQblD36K5Cw3mMsOr/dtk0Nf+oNtENaigrsHyJ2yn+Lzwo8zFEpsUL9xoa3sQY0"
+    )
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

@@ -5,7 +5,8 @@
     "lib/ellion_web.ex",
     "lib/ellion_web/router.ex",
     "lib/ellion_web/telemetry.ex",
-    "lib/ellion_web/views/error_json.ex"
+    "lib/ellion_web/views/error_json.ex",
+    "lib/ellion_web/auth/tokens/token.ex"
   ],
   "terminal_options": {
     "file_column_width": 80

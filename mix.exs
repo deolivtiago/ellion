@@ -55,7 +55,8 @@ defmodule EllionCore.MixProject do
       {:excoveralls, "~> 0.17", only: [:dev, :test], runtime: false},
       {:tzdata, "~> 1.1"},
       {:argon2_elixir, "~> 4.0"},
-      {:faker, "~> 0.17", only: [:dev, :test], runtime: false}
+      {:faker, "~> 0.17", only: [:dev, :test], runtime: false},
+      {:joken, "~> 2.6"}
     ]
   end
 
