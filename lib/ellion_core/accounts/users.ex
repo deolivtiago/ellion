@@ -71,4 +71,18 @@ defmodule EllionCore.Accounts.Users do
 
   """
   defdelegate delete_user(user), to: User.Delete, as: :call
+
+  @doc """
+  Authenticates an user
+
+  ## Examples
+
+      iex> authenticate_user(%{valid: credentials})
+      {:ok, %User{}}
+
+      iex> authenticate_user(%{invalid: credentials})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  defdelegate authenticate_user(user_credentials), to: User.Authenticate, as: :call
 end

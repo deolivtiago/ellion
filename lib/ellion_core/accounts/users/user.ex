@@ -45,4 +45,25 @@ defmodule EllionCore.Accounts.Users.User do
   end
 
   defp put_pass_hash(changeset), do: changeset
+
+  @doc """
+  Validates user credentials
+
+  ## Examples
+
+      iex> validate_credentials(valid_credentials)
+      {:ok, %User{}}
+
+      iex> validate_credentials(invalid_credentials)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def validate_credentials(credentials \\ %{}) do
+    %User{}
+    |> cast(credentials, ~w(email password)a)
+    |> validate_required(~w(email password)a)
+    |> update_change(:email, &String.downcase/1)
+    |> validate_format(:email, ~r/^[a-z0-9\-._+&#$?!]+[@][a-z0-9\-._+]+$/)
+    |> apply_action(:validate)
+  end
 end
