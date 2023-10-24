@@ -156,6 +156,26 @@ defmodule EllionCore.Accounts.UsersTest do
     end
   end
 
+  describe "authenticate/1 returns" do
+    test "ok when credentials are valid" do
+      user = UsersFactory.insert_user()
+      credentials = %{email: user.email, password: user.password}
+
+      assert {:ok, Map.put(user, :password, nil)} == Users.authenticate_user(credentials)
+    end
+
+    test "error when credentials are invalid" do
+      credentials = %{email: "other@mail.com", password: "invalid"}
+
+      assert {:error, changeset} = Users.authenticate_user(credentials)
+      errors = errors_on(changeset)
+
+      assert %Changeset{valid?: false} = changeset
+      assert Enum.member?(errors.email, "invalid credentials")
+      assert Enum.member?(errors.password, "invalid credentials")
+    end
+  end
+
   defp insert_user(_) do
     UsersFactory.insert_user()
     |> Map.put(:password, nil)
