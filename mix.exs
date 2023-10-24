@@ -10,8 +10,13 @@ defmodule EllionCore.MixProject do
       start_permanent: Mix.env() == :prod,
       preferred_cli_env: [
         "test.reset": :test,
-        ci: :test
+        ci: :test,
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
       ],
+      test_coverage: [tool: ExCoveralls],
       aliases: aliases(),
       deps: deps()
     ]
@@ -46,7 +51,8 @@ defmodule EllionCore.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.17", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -68,7 +74,7 @@ defmodule EllionCore.MixProject do
         "compile --warnings-as-errors",
         "format --check-formatted",
         "credo --strict",
-        "test"
+        "coveralls --warnings-as-errors"
       ]
     ]
   end
