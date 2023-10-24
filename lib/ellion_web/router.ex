@@ -5,7 +5,9 @@ defmodule EllionWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", EllionWeb do
+  scope "/", EllionWeb do
     pipe_through :api
+
+    resources "/users", UserController, except: [:new, :edit]
   end
 end
