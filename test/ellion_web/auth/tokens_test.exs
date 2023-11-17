@@ -5,15 +5,34 @@ defmodule EllionWeb.Auth.Tokens.TokenTest do
   alias EllionWeb.Auth.Tokens
 
   setup do
-    {:ok, user: UsersFactory.insert_user()}
+    UsersFactory.insert_user()
+    |> Map.put(:password, nil)
+    |> then(&{:ok, user: &1})
   end
 
-  describe "generate/1 returns ok" do
-    test "with a pair of tokens", %{user: user} do
+  describe "generate/1" do
+    test "returns ok when user is valid", %{user: user} do
       assert {:ok, tokens} = Tokens.generate(user)
 
       assert is_binary(tokens.access)
       assert is_binary(tokens.refresh)
+    end
+
+    test "raises an error when user is invalid" do
+      assert_raise FunctionClauseError, fn -> Tokens.generate(nil) end
+    end
+  end
+
+  describe "validate/1" do
+    test "returns ok when the given token is valid", %{user: user} do
+      {:ok, %{access: access, refresh: refresh}} = Tokens.generate(user)
+
+      assert {:ok, user} == Tokens.validate(access)
+      assert {:ok, user} == Tokens.validate(refresh)
+    end
+
+    test "returns ok when the given token is invalid" do
+      assert {:error, %Ecto.Changeset{}} = Tokens.validate("")
     end
   end
 end
