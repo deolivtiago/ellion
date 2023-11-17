@@ -14,13 +14,13 @@ defmodule EllionWeb.Router do
 
     post "/signup", AuthController, :signup
     post "/signin", AuthController, :signin
-
-    resources "/users", UserController, except: [:new, :edit]
   end
 
   scope "/", EllionWeb do
     pipe_through [:api, :auth]
 
     get "/refresh", AuthController, :refresh
+
+    resources "/users", UserController, except: [:new, :edit]
   end
 end

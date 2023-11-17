@@ -2,6 +2,7 @@ defmodule EllionWeb.UserControllerTest do
   use EllionWeb.ConnCase, async: true
 
   alias EllionCore.Factories.UsersFactory
+  alias EllionWeb.Auth.Tokens
 
   @id_not_found Ecto.UUID.generate()
 
@@ -12,7 +13,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "index/2 returns success" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "with a list of users when there are users", %{conn: conn, user: user} do
       conn = get(conn, ~p"/users")
@@ -26,7 +27,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "create/2 returns success" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "when the user parameters are valid", %{conn: conn} do
       user_params = UsersFactory.user_attrs()
@@ -42,7 +43,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "create/2 returns error" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "when the user parameters are invalid", %{conn: conn} do
       user_params = %{email: "???", full_name: nil, password: "?"}
@@ -58,7 +59,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "show/2 returns success" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "when the user id is found", %{conn: conn, user: user} do
       conn = get(conn, ~p"/users/#{user}")
@@ -72,7 +73,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "show/2 returns error" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "when the user id is not found", %{conn: conn} do
       conn = get(conn, ~p"/users/#{@id_not_found}")
@@ -84,7 +85,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "update/2 returns success" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "when the user parameters are valid", %{conn: conn, user: user} do
       user_params = UsersFactory.user_attrs()
@@ -100,7 +101,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "update/2 returns error" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "when the user parameters are invalid", %{conn: conn, user: user} do
       user_params = %{email: "?@?", full_name: "?", password: nil}
@@ -116,7 +117,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "delete/2 returns success" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "when the user is found", %{conn: conn, user: user} do
       conn = delete(conn, ~p"/users/#{user}")
@@ -126,7 +127,7 @@ defmodule EllionWeb.UserControllerTest do
   end
 
   describe "delete/2 returns error" do
-    setup [:insert_user]
+    setup [:insert_user, :put_token]
 
     test "when the user is not found", %{conn: conn} do
       conn = delete(conn, ~p"/users/#{@id_not_found}")
@@ -141,5 +142,13 @@ defmodule EllionWeb.UserControllerTest do
     UsersFactory.insert_user()
     |> Map.put(:password, nil)
     |> then(&{:ok, user: &1})
+  end
+
+  defp put_token(%{conn: conn, user: user}) do
+    {:ok, %{access: token}} = Tokens.generate(user)
+
+    conn
+    |> put_req_header("authorization", "Bearer " <> token)
+    |> then(&{:ok, conn: &1})
   end
 end
