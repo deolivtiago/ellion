@@ -2,6 +2,7 @@ defmodule EllionWeb.AuthControllerTest do
   use EllionWeb.ConnCase, async: true
 
   alias EllionCore.Factories.UsersFactory
+  alias EllionWeb.Auth.Tokens
 
   setup %{conn: conn} do
     conn
@@ -66,8 +67,41 @@ defmodule EllionWeb.AuthControllerTest do
     end
   end
 
+  describe "refresh/1 returns ok" do
+    setup [:insert_user, :put_token]
+
+    test "when token is invalid", %{conn: conn} do
+      conn = get(conn, ~p"/refresh")
+
+      assert %{"data" => %{"tokens" => tokens}} = json_response(conn, :ok)
+
+      assert is_binary(tokens["access"])
+      assert is_binary(tokens["refresh"])
+    end
+  end
+
+  describe "refresh/1 returns error" do
+    test "when token is not found", %{conn: conn} do
+      assert response(get(conn, ~p"/refresh"), :unauthorized)
+    end
+
+    test "when token is invalid", %{conn: conn} do
+      conn = put_req_header(conn, "authorization", "Bearer invalid_token")
+
+      assert response(get(conn, ~p"/refresh"), :unauthorized)
+    end
+  end
+
   defp insert_user(_) do
     UsersFactory.insert_user()
     |> then(&{:ok, user: &1})
+  end
+
+  defp put_token(%{conn: conn, user: user}) do
+    {:ok, %{refresh: token}} = Tokens.generate(user)
+
+    conn
+    |> put_req_header("authorization", "Bearer " <> token)
+    |> then(&{:ok, conn: &1})
   end
 end
