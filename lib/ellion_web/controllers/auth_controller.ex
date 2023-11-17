@@ -8,7 +8,6 @@ defmodule EllionWeb.AuthController do
   action_fallback EllionWeb.FallbackController
 
   @doc false
-  @spec signin(Plug.Conn.t(), map) :: Plug.Conn.t()
   def signin(conn, %{"credentials" => user_credentials}) do
     with {:ok, user} <- Users.authenticate_user(user_credentials),
          {:ok, tokens} <- Tokens.generate(user) do
@@ -17,7 +16,6 @@ defmodule EllionWeb.AuthController do
   end
 
   @doc false
-  @spec signup(Plug.Conn.t(), map) :: Plug.Conn.t()
   def signup(conn, %{"user" => user_params}) do
     with {:ok, user} <- Users.create_user(user_params),
          {:ok, tokens} <- Tokens.generate(user) do
@@ -25,6 +23,13 @@ defmodule EllionWeb.AuthController do
       |> put_status(:created)
       |> put_resp_header("location", ~p"/users/#{user}")
       |> render(:index, tokens: tokens)
+    end
+  end
+
+  @doc false
+  def refresh(%{assigns: %{current_user: user}} = conn, _params) do
+    with {:ok, tokens} <- Tokens.generate(user) do
+      render(conn, :index, tokens: tokens)
     end
   end
 end

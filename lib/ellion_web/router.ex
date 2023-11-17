@@ -5,6 +5,10 @@ defmodule EllionWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug EllionWeb.Plugs.AuthenticationPlug
+  end
+
   scope "/", EllionWeb do
     pipe_through :api
 
@@ -12,5 +16,11 @@ defmodule EllionWeb.Router do
     post "/signin", AuthController, :signin
 
     resources "/users", UserController, except: [:new, :edit]
+  end
+
+  scope "/", EllionWeb do
+    pipe_through [:api, :auth]
+
+    get "/refresh", AuthController, :refresh
   end
 end
