@@ -21,10 +21,19 @@ defmodule EllionWeb.Plugs.AuthenticationPlug do
   end
 
   defp validate_token(conn) do
+    type = token_type(conn.request_path)
+
     conn
     |> get_req_header("authorization")
     |> List.first("")
     |> String.replace(~r/^Bearer\s/, "")
-    |> Tokens.validate()
+    |> Tokens.validate(type)
+  end
+
+  defp token_type(request_path) do
+    request_path
+    |> String.split("/", trim: true)
+    |> Enum.filter(&String.match?(&1, ~r/^refresh$/))
+    |> List.first("access")
   end
 end
