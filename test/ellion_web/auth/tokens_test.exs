@@ -27,12 +27,16 @@ defmodule EllionWeb.Auth.Tokens.TokenTest do
     test "returns ok when the given token is valid", %{user: user} do
       {:ok, %{access: access, refresh: refresh}} = Tokens.generate(user)
 
-      assert {:ok, user} == Tokens.validate(access)
-      assert {:ok, user} == Tokens.validate(refresh)
+      assert {:ok, user} == Tokens.validate(access, "access")
+      assert {:ok, user} == Tokens.validate(refresh, "refresh")
     end
 
-    test "returns ok when the given token is invalid" do
-      assert {:error, %Ecto.Changeset{}} = Tokens.validate("")
+    test "returns error when the given token is invalid", %{user: user} do
+      {:ok, %{access: access, refresh: refresh}} = Tokens.generate(user)
+
+      assert {:error, %Ecto.Changeset{}} = Tokens.validate(access, "refresh")
+      assert {:error, %Ecto.Changeset{}} = Tokens.validate(refresh, "access")
+      assert {:error, %Ecto.Changeset{}} = Tokens.validate("", "access")
     end
   end
 end
