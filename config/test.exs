@@ -20,6 +20,12 @@ config :ellion, EllionWeb.Endpoint,
   secret_key_base: "GmTq0iS7PKx8HdA1Nmtn0MG4+9tLeL83mfhlZntd9pu73+fb2czhcHu9Y5JYZp+U",
   server: false
 
+# In test we don't send emails.
+config :ellion, EllionCore.Mailer, adapter: Swoosh.Adapters.Test
+
+# Disable swoosh api client as it is only required for production adapters.
+config :swoosh, :api_client, false
+
 # Print only warnings and errors during test
 config :logger, level: :warning
 

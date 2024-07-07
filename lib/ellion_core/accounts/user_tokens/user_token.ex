@@ -9,7 +9,7 @@ defmodule EllionCore.Accounts.UserTokens.UserToken do
   alias __MODULE__
   alias EllionCore.Accounts.Users.User
 
-  @required_attrs ~w(id user_id token expiration)a
+  @required_attrs ~w(id user_id token expiration type)a
 
   @primary_key {:id, :binary_id, autogenerate: false}
   @foreign_key_type :binary_id
@@ -18,6 +18,7 @@ defmodule EllionCore.Accounts.UserTokens.UserToken do
   schema "user_tokens" do
     field :token, :string
     field :expiration, :utc_datetime
+    field :type, Ecto.Enum, values: ~w(access refresh confirm_email reset_password change_email)a
 
     belongs_to :user, User
 

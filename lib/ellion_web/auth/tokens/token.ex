@@ -7,7 +7,7 @@ defmodule EllionWeb.Auth.Tokens.Token do
   @host "api.ellion.io"
   @two_days 60 * 60 * 24 * 2
   @two_weeks 60 * 60 * 24 * 7 * 2
-  @tokens_typ ~w(access refresh)
+  @token_types ~w(access refresh confirm_email reset_password change_email)
 
   add_hook(Joken.Hooks.RequiredClaims, ~w(jti iss aud typ sub exp)a)
 
@@ -25,12 +25,12 @@ defmodule EllionWeb.Auth.Tokens.Token do
   ## Examples
 
       iex> new("any-uuid", "access")
-      {:ok, "bearer-token", %{"sub" => "any-uuid", "typ" => "access"}}
+      {:ok, "access-token", %{"sub" => "any-uuid", "typ" => "access"}}
 
       iex> new(nil, "access")
       {:error, reason}
   """
-  def new(sub, typ \\ "access") when is_binary(sub) and typ in @tokens_typ do
+  def new(sub, typ \\ "access") when is_binary(sub) and typ in @token_types do
     Map.new()
     |> Map.put("typ", typ)
     |> Map.put("sub", sub)
@@ -51,7 +51,7 @@ defmodule EllionWeb.Auth.Tokens.Token do
     end
   end
 
-  defp valid_typ?(typ), do: Enum.member?(@tokens_typ, typ)
+  defp valid_typ?(typ), do: Enum.member?(@token_types, typ)
 
   defp generate_uuid, do: Ecto.UUID.generate()
 end

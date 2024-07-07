@@ -11,7 +11,7 @@ defmodule EllionWeb.Plugs.AuthenticationPlug do
 
   @doc false
   def call(conn, _opts) do
-    case validate_token(conn) do
+    case verify_auth_token(conn) do
       {:ok, user} ->
         assign(conn, :current_user, user)
 
@@ -20,14 +20,14 @@ defmodule EllionWeb.Plugs.AuthenticationPlug do
     end
   end
 
-  defp validate_token(conn) do
+  defp verify_auth_token(conn) do
     type = token_type(conn.request_path)
 
     conn
     |> get_req_header("authorization")
     |> List.first("")
     |> String.replace(~r/^Bearer\s/, "")
-    |> Tokens.validate(type)
+    |> Tokens.validate_token(type)
   end
 
   defp token_type(request_path) do

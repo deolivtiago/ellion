@@ -2,50 +2,45 @@ defmodule EllionWeb.Auth.Tokens do
   @moduledoc """
   Tokens management
   """
-  alias EllionCore.Accounts.Users
   alias EllionCore.Accounts.Users.User
   alias EllionCore.Accounts.UserTokens
   alias EllionCore.Accounts.UserTokens.UserToken
   alias EllionWeb.Auth.Tokens.Token
 
+  @token_types ~w(access refresh confirm_email reset_password change_email)
+
   @doc """
-  Generates a pair of tokens
+  Generates a token with the given type
 
   ## Examples
 
-    iex> generate(user)
-    {:ok, %{access: "access-token", refresh: "refresh-token"}}
+    iex> generate_token(%User{}, "access")
+    {:ok, "access-token"}}
 
   """
-  def generate(%User{id: user_id}) do
-    with {:ok, access_token, _claims} <- Token.new(user_id, "access"),
-         {:ok, refresh_token, %{"jti" => id, "exp" => exp}} <- Token.new(user_id, "refresh") do
-      Map.new()
-      |> Map.put(:id, id)
-      |> Map.put(:user_id, user_id)
-      |> Map.put(:token, refresh_token)
-      |> Map.put(:expiration, DateTime.from_unix!(exp))
-      |> UserTokens.create_user_token()
-
-      {:ok, %{access: access_token, refresh: refresh_token}}
+  def generate_token(%User{id: sub}, type) when is_binary(sub) and type in @token_types do
+    with {:ok, token, claims} <- Token.new(sub, type),
+         {:ok, _user_token} <- insert_user_token(token, claims) do
+      {:ok, token}
     end
   end
 
   @doc """
-  Validates the given token
+  Validates a token with the given type
 
   ## Examples
 
-      iex> validate("valid-token", "refresh")
+      iex> validate_token("valid-token", "refresh")
       {:ok, %User{}}
 
-      iex> validate("invalid-token", "access")
+      iex> validate_token("invalid-token", "access")
       {:error, %Ecto.Changeset{}}
 
   """
-  def validate(token, type) when type in ~w(access refresh) do
-    with {:ok, %{"typ" => ^type} = claims} <- Token.verify_and_validate(token),
-         {:ok, user} <- get_user_by_claims(claims) do
+  def validate_token(token, type) when type in @token_types do
+    with {:ok, %{"typ" => ^type, "jti" => id}} <- Token.verify_and_validate(token),
+         {:ok, user_token} <- UserTokens.get_user_token(:id, id),
+         {:ok, %UserToken{user: user}} <- UserTokens.delete_user_token(user_token) do
       {:ok, user}
     else
       _error ->
@@ -56,12 +51,13 @@ defmodule EllionWeb.Auth.Tokens do
     end
   end
 
-  defp get_user_by_claims(%{"jti" => id, "typ" => "refresh"}) do
-    with {:ok, user_token} <- UserTokens.get_user_token(:id, id),
-         {:ok, %UserToken{user: user}} <- UserTokens.delete_user_token(user_token) do
-      {:ok, user}
-    end
+  defp insert_user_token(token, claims) when is_binary(token) and is_map(claims) do
+    Map.new()
+    |> Map.put(:id, claims["jti"])
+    |> Map.put(:user_id, claims["sub"])
+    |> Map.put(:token, token)
+    |> Map.put(:type, claims["typ"])
+    |> Map.put(:expiration, DateTime.from_unix!(claims["exp"]))
+    |> UserTokens.create_user_token()
   end
-
-  defp get_user_by_claims(%{"sub" => id}), do: Users.get_user(:id, id)
 end

@@ -6,6 +6,7 @@ defmodule EllionCore.Repo.Migrations.CreateUserTokens do
       add :id, :binary_id, primary_key: true
       add :token, :text, null: false
       add :expiration, :timestamptz, null: false
+      add :type, :string, null: false
 
       add :user_id,
           references(:users, on_delete: :delete_all, on_update: :update_all, type: :binary_id),

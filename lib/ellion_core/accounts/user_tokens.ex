@@ -22,7 +22,7 @@ defmodule EllionCore.Accounts.UserTokens do
   ## Examples
 
       iex> get_user_token(field, value)
-      {:ok, %User{}}
+      {:ok, %UserToken{}}
 
       iex> get_user_token(field, bad_value)
       {:error, %Ecto.Changeset{}}
@@ -36,7 +36,7 @@ defmodule EllionCore.Accounts.UserTokens do
   ## Examples
 
       iex> create_user_token(%{field: value})
-      {:ok, %User{}}
+      {:ok, %UserToken{}}
 
       iex> create_user_token(%{field: bad_value})
       {:error, %Ecto.Changeset{}}
@@ -50,7 +50,7 @@ defmodule EllionCore.Accounts.UserTokens do
   ## Examples
 
       iex> delete_user_token(user_token)
-      {:ok, %User{}}
+      {:ok, %UserToken{}}
 
       iex> delete_user_token(user_token)
       {:error, %Ecto.Changeset{}}

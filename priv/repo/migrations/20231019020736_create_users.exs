@@ -8,7 +8,7 @@ defmodule EllionCore.Repo.Migrations.CreateUsers do
       add :full_name, :string, null: false
       add :email, :string, null: false
       add :password_hash, :string, null: false
-      add :is_disabled, :boolean, default: false, null: false
+      add :is_disabled, :boolean, default: false, null: true
 
       timestamps(type: :timestamptz)
     end

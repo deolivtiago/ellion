@@ -23,6 +23,15 @@ config :ellion, EllionWeb.Endpoint,
   pubsub_server: EllionCore.PubSub,
   live_view: [signing_salt: "1DA6t87e"]
 
+# Configures the mailer
+#
+# By default it uses the "Local" adapter which stores the emails
+# locally. You can see the emails in your browser, at "/dev/mailbox".
+#
+# For production it's recommended to configure a different adapter
+# at the `config/runtime.exs`.
+config :ellion, EllionCore.Mailer, adapter: Swoosh.Adapters.Local
+
 # Configures the database timezone
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 

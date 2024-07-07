@@ -8,8 +8,8 @@ defmodule EllionCore.Accounts.Users.User do
 
   alias __MODULE__
 
-  @required_attrs ~w(full_name email password)a
-  @optional_attrs ~w(is_disabled)a
+  @required_attrs ~w(full_name email)a
+  @optional_attrs ~w(is_disabled password)a
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -20,7 +20,7 @@ defmodule EllionCore.Accounts.Users.User do
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :password_hash, :string
-    field :is_disabled, :boolean, default: false
+    field :is_disabled, :boolean, default: true
 
     timestamps()
   end
